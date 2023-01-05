@@ -1,6 +1,9 @@
+#_-_encoding=utf8_-_
+#__author__="huiseong.song"
+
 from tkinter import *
 from openpyxl import load_workbook
-from openpyxl.styles import Color, PatternFill
+from openpyxl.styles import PatternFill
 from datetime import datetime
 
 
@@ -18,7 +21,8 @@ today = datetime.today()
 rental = load_workbook("정합성 단말 대여 리스트_"+ str(today).replace("-","")[2:8] +".xlsx") # 엑셀파일에서 wb 호출
 rentalSheet = rental.active # 활성화된 Sheet
 db = load_workbook("list.xlsx")
-dbSheet = db.active
+dbSheet = db.active 
+
 
 ########################################################################################
 
@@ -33,30 +37,34 @@ num.pack() # num pack
 ########################################################################################
 
 def Add():
+    days = rentalSheet.cell(row=2, column=12).value # K2의 날짜를 체크할 변수
+    if days not in str(today): # today의 날짜 값과 days의 날짜 값이 다른지 체크
+        rentalSheet.cell(row=2, column=12, value=str(today)[0:11]+" 확인") # 다르면 K2에 추가하는 날의 날짜로 변경
+    
     # 단말 대여 처리
-    imei = num.get()
-    Rimeis = []
-    DBimeis = []
+    imei = num.get() # 입력 받은 imei를 저장할 변수
+    Rimeis = [] # 대여 리스트 엑셀의 imei를 담을 리스트
+    DBimeis = [] # 보유 리스트 엑셀의 imei를 담을 리스트
     if len(imei) == 15:
 
         for dx in dbSheet["E"]:
-            DBimeis.append(dx.value) # list 엑셀에서 E열값 리스트 생성
+            DBimeis.append(dx.value) # list 엑셀에서 E열값을 받아와 imei 리스트 생성
 
         for rx in rentalSheet["F"]:
-            Rimeis.append(rx.value) # 대여 리스트 엑셀에서 F열값 리스트 생성
+            Rimeis.append(rx.value) # 대여 리스트 엑셀에서 F열값을 받아와 imei 리스트 생성
         
-        Eloc = (DBimeis.index(int(imei)))+1 # list 엑셀 E열값 중에서 입력받은 IMEI 값의 위치 값 추출
+        Eloc = (DBimeis.index(int(imei)))+1 # 보유 리스트 엑셀 E열값 중에서 입력받은 IMEI 값의 rows 값 추출
 
         CPinfo = [] # 입력받은 IMEI의 해당 단말 정보를 저장할 리스트
         for x in range(1, dbSheet.max_column+1):
-            CPinfo.append(dbSheet.cell(row=Eloc, column=x).value) # list 엑셀에 입력받은 imei 단말 위치의 행 값을 추출
+            CPinfo.append(dbSheet.cell(row=Eloc, column=x).value) # 보유 리스트 엑셀에서 가져온 imei 단말 위치의 행 전체 값을 추출
         
         
         if imei in Rimeis: # IMEI 값이 IMEIS에 들어있는지 체크
             print("이미 등록되어 있는 단말임")
         else:
-            x= rentalSheet.max_row+1# 대여 리스트의 마지막 행 다음 행 위치 값을 고정하기 위한 변수
-            n=0 # list 엑셀에서 추출한 데이터 리스트 순서를 체크할 변수
+            x= rentalSheet.max_row+1# 대여 리스트에 작성할 행을 저장
+            n=0 # 보유 리스트 엑셀에서 추출한 데이터 리스트 순서를 체크할 변수
             for y in range(2, 7):
                 rentalSheet.cell(row=x, column=y, value=str(CPinfo[n])) # list 엑셀에서 가져온 데이터를 대여 리스트 엑셀 마지막 행에 순차적으로 입력 
                 n+=1
@@ -97,8 +105,9 @@ def back():
         for x in range(1, rentalSheet.max_column+1):
             # 반납에 해당하는 컬러 값"d9d9d9"
             rentalSheet.cell(row=Floc, column=x).fill = PatternFill(start_color="d9d9d9", end_color="d9d9d9", fill_type="solid")
-            rentalSheet.cell(row=Floc, column=12, value="반납")
-            rentalSheet.cell(row=Floc, column=13, value="")
+        rentalSheet.cell(row=Floc, column=12, value="반납")
+        rentalSheet.cell(row=Floc, column=13, value="")
+        
         rental.save("정합성 단말 대여 리스트_"+ str(today).replace("-","")[2:8] +".xlsx") # IMEI 추가 후 저장
     else:
         print("없는데 뭘 찾는 거야")
