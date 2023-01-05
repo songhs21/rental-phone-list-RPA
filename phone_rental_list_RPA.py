@@ -1,6 +1,7 @@
 from tkinter import *
 from openpyxl import load_workbook
-from datetime import datetime, timedelta
+from openpyxl.styles import Color, PatternFill
+from datetime import datetime
 
 
 ########################################################################################
@@ -8,7 +9,7 @@ from datetime import datetime, timedelta
 #Tkinter 생성
 root = Tk() # Tkinter 생성
 root.title("IMEI 추가 귀찮은ww") # 타이틀 설정
-root.geometry("400x60") # 창 크기 설정
+root.geometry("400x100") # 창 크기 설정
 root.resizable(False, False) # 창 크기 변경 가능 여부 설정
 
 
@@ -22,12 +23,12 @@ dbSheet = db.active
 ########################################################################################
 
 frame1 = Frame(root) # 프레임 생성
-frame1.pack(side="left", fill="both", expand=True) # 프레임 표시
+frame1.pack(side="left", fill="both", pady=(18,0), expand=True) # 프레임 표시
 
 # IMEI
 Label(frame1, text="IMEI").pack() # "이름" 라벨 생성 후 pack
-num = Entry(frame1, width=30) # 텍스트 필드 생성 후 name 에 저장
-num.pack() # name pack
+num = Entry(frame1, width=30) # 텍스트 필드 생성 후 num 에 저장
+num.pack() # num pack
 
 ########################################################################################
 
@@ -36,8 +37,10 @@ def Add(): # 단말 정보 추가 함수
     Rimeis = []
     DBimeis = []
     if len(imei) == 15:
+
         for dx in dbSheet["E"]:
             DBimeis.append(dx.value) # list 엑셀에서 E열값 리스트 생성
+
         for rx in rentalSheet["F"]:
             Rimeis.append(rx.value) # 대여 리스트 엑셀에서 F열값 리스트 생성
         
@@ -46,7 +49,6 @@ def Add(): # 단말 정보 추가 함수
         CPinfo = [] # 입력받은 IMEI의 해당 단말 정보를 저장할 리스트
         for x in range(1, dbSheet.max_column+1):
             CPinfo.append(dbSheet.cell(row=Eloc, column=x).value) # list 엑셀에 입력받은 imei 단말 위치의 행 값을 추출
-        # print(CPinfo)
         
         
         if imei in Rimeis: # IMEI 값이 IMEIS에 들어있는지 체크
@@ -78,11 +80,34 @@ def Add(): # 단말 정보 추가 함수
         print("imei 자리 수 확인 필요")
 ########################################################################################
 
+
+########################################################################################
+def back():
+    imei = num.get()
+    Rimeis = []
+
+    for rx in rentalSheet["F"]:
+        Rimeis.append(rx.value) # 대여 리스트 엑셀에서 F열값 리스트 생성
+
+    print(Rimeis)
+
+    Floc = (Rimeis.index(int(imei)))+1
+
+    print(Floc)
+
+    if imei in Rimeis : # IMEI 값이 RIMEIS에 들어있는지 체크
+        for x in range(rentalSheet.max_column+1):
+            rentalSheet.cell(row=Floc, column=x).PatternFill(Fill_type="solid", fgColor="d9d9d9")
+
+        rental.save("정합성 단말 대여 리스트_"+ str(today).replace("-","")[2:8] +".xlsx") # IMEI 추가 후 저장
+    else:
+        print("asdf")
+########################################################################################
+
+
 frame2 = Frame(root)
 frame2.pack(side="right", fill="both", expand=True)
-
-# 글 작성
-Button(frame2, text="추가", height=20, command=Add).pack(fill="both")
-
+Button(frame2, text="대여", command=Add).pack(fill="both", expand=True)
+Button(frame2, text="반납", command=back).pack(fill="both", expand=True)
 
 root.mainloop()
