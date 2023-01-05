@@ -32,7 +32,8 @@ num.pack() # num pack
 
 ########################################################################################
 
-def Add(): # 단말 정보 추가 함수
+def Add():
+    # 단말 대여 처리
     imei = num.get()
     Rimeis = []
     DBimeis = []
@@ -82,6 +83,7 @@ def Add(): # 단말 정보 추가 함수
 
 
 ########################################################################################
+# 단말 반납 처리
 def back():
     imei = num.get()
     Rimeis = []
@@ -89,19 +91,17 @@ def back():
     for rx in rentalSheet["F"]:
         Rimeis.append(rx.value) # 대여 리스트 엑셀에서 F열값 리스트 생성
 
-    print(Rimeis)
-
     Floc = (Rimeis.index(int(imei)))+1
 
-    print(Floc)
-
-    if imei in Rimeis : # IMEI 값이 RIMEIS에 들어있는지 체크
-        for x in range(rentalSheet.max_column+1):
-            rentalSheet.cell(row=Floc, column=x).PatternFill(Fill_type="solid", fgColor="d9d9d9")
-
+    if int(imei) in Rimeis : # IMEI 값이 RIMEIS에 들어있는지 체크
+        for x in range(1, rentalSheet.max_column+1):
+            # 반납에 해당하는 컬러 값"d9d9d9"
+            rentalSheet.cell(row=Floc, column=x).fill = PatternFill(start_color="d9d9d9", end_color="d9d9d9", fill_type="solid")
+            rentalSheet.cell(row=Floc, column=12, value="반납")
+            rentalSheet.cell(row=Floc, column=13, value="")
         rental.save("정합성 단말 대여 리스트_"+ str(today).replace("-","")[2:8] +".xlsx") # IMEI 추가 후 저장
     else:
-        print("asdf")
+        print("없는데 뭘 찾는 거야")
 ########################################################################################
 
 
