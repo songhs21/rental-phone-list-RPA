@@ -3,7 +3,7 @@
 
 from tkinter import *
 from openpyxl import load_workbook
-from openpyxl.styles import PatternFill
+from openpyxl.styles import PatternFill, Font, Border, Side, Alignment
 from datetime import datetime
 
 
@@ -65,6 +65,13 @@ def Add():
         else:
             x= rentalSheet.max_row+1# 대여 리스트에 작성할 행을 저장
             n=0 # 보유 리스트 엑셀에서 추출한 데이터 리스트 순서를 체크할 변수
+
+            for y in range(rentalSheet.max_column): # 새로 추가할 row에 스타일 적용 
+                rentalSheet[x][y].font = Font(name="맑은 고딕", size=10, color="000000")
+                rentalSheet[x][y].border = Border(left=Side(style="thin"), right=Side(style="thin"), top=Side(style="thin"), bottom=Side(style="thin"))
+                rentalSheet[x][y].alignment = Alignment(horizontal="center", vertical="center")
+
+
             for y in range(2, 7):
                 rentalSheet.cell(row=x, column=y, value=str(CPinfo[n])) # list 엑셀에서 가져온 데이터를 대여 리스트 엑셀 마지막 행에 순차적으로 입력 
                 n+=1
