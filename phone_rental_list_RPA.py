@@ -67,7 +67,7 @@ def Add():
             n=0 # 보유 리스트 엑셀에서 추출한 데이터 리스트 순서를 체크할 변수
 
             for y in range(rentalSheet.max_column): # 새로 추가할 row에 스타일 적용 
-                rentalSheet[x][y].font = Font(name="맑은 고딕", size=10, color="FFFFFF")
+                rentalSheet[x][y].font = Font(name="맑은 고딕", size=10, color="000000")
                 rentalSheet[x][y].border = Border(left=Side(style="thin"), right=Side(style="thin"), top=Side(style="thin"), bottom=Side(style="thin"))
                 rentalSheet[x][y].alignment = Alignment(horizontal="center", vertical="center")
 
