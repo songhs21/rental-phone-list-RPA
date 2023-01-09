@@ -7,6 +7,7 @@ from openpyxl import load_workbook
 from openpyxl.styles import PatternFill, Font, Border, Side, Alignment
 from datetime import datetime, timedelta
 import os
+import shutil
 
 ########################################################################################
 
@@ -25,14 +26,19 @@ today = datetime.today()
 directory = "D:\Python" # 파일이 존재하는 위치 변수
 for filename in os.listdir(directory):
         f = os.path.join(directory, filename) # 파일 리스트 생성
+
 if "정합성 단말 대여 리스트_"+ str(today).replace("-","")[2:8] +".xlsx" in f:
     rental = load_workbook("정합성 단말 대여 리스트_"+ str(today).replace("-","")[2:8] +".xlsx") # today 날짜의 파일이 있으면 파일 불러오기
     print(str(today)[2:10] + " 파일 오픈")
 else:
-    for n in range(1, 14):
+    for n in range(1, 15): # 하루 전 부터 2주 전까지 체크
         if "정합성 단말 대여 리스트_"+ str(today-timedelta(days=n)).replace("-","")[2:8] +".xlsx" in f: # today 날짜의 파일이 없는 경우 하루씩 돌아가며 체크
-            rental = load_workbook("정합성 단말 대여 리스트_"+ str(today-timedelta(days=n)).replace("-","")[2:8] +".xlsx") # 해당 날짜의 파일 불러오기
-            rentalSheet = rental.active # 엑셀 시트 활성화
+            # rental = load_workbook("정합성 단말 대여 리스트_"+ str(today-timedelta(days=n)).replace("-","")[2:8] +".xlsx") # 해당 날짜의 파일 불러오기
+            # rentalSheet = rental.active # 엑셀 시트 활성화
+            shutil.copy("정합성 단말 대여 리스트_"+ str(today-timedelta(days=n)).replace("-","")[2:8] +".xlsx",\
+                "정합성 단말 대여 리스트_"+ str(today).replace("-","")[2:8] +".xlsx")
+            rental = load_workbook("정합성 단말 대여 리스트_"+ str(today).replace("-","")[2:8] +".xlsx")
+            rentalSheet = rental.active
             print(str(today-timedelta(days=n))[2:10] + " 파일 오픈") # 오픈한 파일의 날짜를 출력.
             break
         else:
@@ -60,6 +66,10 @@ lender.pack(pady=(10, 0)) #
 ########################################################################################
 
 def Add():
+
+    if "정합성 단말 대여 리스트_"+ str(today).replace("-","")[2:8] +".xlsx" in f:
+        rental = load_workbook("정합성 단말 대여 리스트_"+ str(today).replace("-","")[2:8] +".xlsx") # today 날짜의 파일이 있으면 파일 불러오기
+        print(str(today)[2:10] + " 파일 오픈")
 
     days = rentalSheet.cell(row=2, column=12).value # K2의 날짜를 체크할 변수
     if days not in str(today): # today의 날짜 값과 days의 날짜 값이 다른지 체크
@@ -131,6 +141,11 @@ def Add():
 ########################################################################################
 # 단말 반납 처리
 def back():
+    
+    if "정합성 단말 대여 리스트_"+ str(today).replace("-","")[2:8] +".xlsx" in f:
+        rental = load_workbook("정합성 단말 대여 리스트_"+ str(today).replace("-","")[2:8] +".xlsx") # today 날짜의 파일이 있으면 파일 불러오기
+        print(str(today)[2:10] + " 파일 오픈")
+        
     imei = str(num.get())
     Rimeis = []
 
