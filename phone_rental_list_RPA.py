@@ -37,12 +37,11 @@ else:
             # rentalSheet = rental.active # 엑셀 시트 활성화
             shutil.copy("정합성 단말 대여 리스트_"+ str(today-timedelta(days=n)).replace("-","")[2:8] +".xlsx",\
                 "정합성 단말 대여 리스트_"+ str(today).replace("-","")[2:8] +".xlsx")
-            rental = load_workbook("정합성 단말 대여 리스트_"+ str(today).replace("-","")[2:8] +".xlsx")
-            rentalSheet = rental.active
-            print(str(today-timedelta(days=n))[2:10] + " 파일 오픈") # 오픈한 파일의 날짜를 출력.
+            print(str(today-timedelta(days=n))[2:10] + ">" + str(today)[2:10]+" copy & today excel file open") # 오픈한 파일의 날짜를 출력.
             break
-        else:
-            print(str(today-timedelta(days=n))[2:10] + " 파일 없음")
+
+rental = load_workbook("정합성 단말 대여 리스트_"+ str(today).replace("-","")[2:8] +".xlsx")
+rentalSheet = rental.active
 
 # T4팀 보유 단말 리스트 엑셀 불러오기
 db = load_workbook("list.xlsx") 
@@ -67,16 +66,16 @@ lender.pack(pady=(10, 0)) #
 
 def Add():
 
-    if "정합성 단말 대여 리스트_"+ str(today).replace("-","")[2:8] +".xlsx" in f:
-        rental = load_workbook("정합성 단말 대여 리스트_"+ str(today).replace("-","")[2:8] +".xlsx") # today 날짜의 파일이 있으면 파일 불러오기
-        print(str(today)[2:10] + " 파일 오픈")
+    # if "정합성 단말 대여 리스트_"+ str(today).replace("-","")[2:8] +".xlsx" in f:
+    #     rental = load_workbook("정합성 단말 대여 리스트_"+ str(today).replace("-","")[2:8] +".xlsx") # today 날짜의 파일이 있으면 파일 불러오기
+    #     print(str(today)[2:10] + " 파일 오픈")
 
     days = rentalSheet.cell(row=2, column=12).value # K2의 날짜를 체크할 변수
     if days not in str(today): # today의 날짜 값과 days의 날짜 값이 다른지 체크
         rentalSheet.cell(row=2, column=12, value=str(today)[0:11]+" 확인") # 다르면 K2에 추가하는 날의 날짜로 변경
     
     # 단말 대여 처리
-    imei = num.get() # 입력 받은 imei를 저장할 변수
+    imei = str(num.get()) # 입력 받은 imei를 저장할 변수
     Rimeis = [] # 대여 리스트 엑셀의 imei를 담을 리스트
     DBimeis = [] # 보유 리스트 엑셀의 imei를 담을 리스트
 
@@ -95,7 +94,7 @@ def Add():
             CPinfo.append(dbSheet.cell(row=Eloc, column=x).value) # 보유 리스트 엑셀에서 가져온 imei 단말 위치의 행 전체 값을 추출
         
         
-        if imei not in Rimeis: # IMEI 값이 IMEIS에 들어있는지 체크
+        if int(imei) not in Rimeis: # IMEI 값이 IMEIS에 들어있는지 체크
 
             name = lender.get()
             x= rentalSheet.max_row+1# 대여 리스트에 작성할 행을 저장
@@ -108,7 +107,7 @@ def Add():
 
 
             for y in range(2, 7):
-                rentalSheet.cell(row=x, column=y, value=str(CPinfo[n])) # list 엑셀에서 가져온 데이터를 대여 리스트 엑셀 마지막 행에 순차적으로 입력 
+                rentalSheet.cell(row=x, column=y, value=CPinfo[n]) # list 엑셀에서 가져온 데이터를 대여 리스트 엑셀 마지막 행에 순차적으로 입력 
                 n+=1
             rentalSheet.cell(row=rentalSheet.max_row, column=7, value="정합성/신뢰성")
             rentalSheet.cell(row=rentalSheet.max_row, column=8, value=name)
@@ -142,9 +141,9 @@ def Add():
 # 단말 반납 처리
 def back():
     
-    if "정합성 단말 대여 리스트_"+ str(today).replace("-","")[2:8] +".xlsx" in f:
-        rental = load_workbook("정합성 단말 대여 리스트_"+ str(today).replace("-","")[2:8] +".xlsx") # today 날짜의 파일이 있으면 파일 불러오기
-        print(str(today)[2:10] + " 파일 오픈")
+    # if "정합성 단말 대여 리스트_"+ str(today).replace("-","")[2:8] +".xlsx" in f:
+    #     rental = load_workbook("정합성 단말 대여 리스트_"+ str(today).replace("-","")[2:8] +".xlsx") # today 날짜의 파일이 있으면 파일 불러오기
+    #     print(str(today)[2:10] + " 파일 오픈")
         
     imei = str(num.get())
     Rimeis = []
@@ -152,13 +151,21 @@ def back():
     for rx in rentalSheet["F"]:
         Rimeis.append(rx.value) # 대여 리스트 엑셀에서 F열값 리스트 생성
 
-    Floc = (Rimeis.index(str(imei)))+1
 
-
-    if str(imei) in Rimeis : # IMEI 값이 RIMEIS에 들어있는지 체크
+    if imei in Rimeis : # IMEI 값이 RIMEIS에 들어있는지 체크
+        Floc = (Rimeis.index(str(imei)))+1
         for x in range(1, rentalSheet.max_column+1):
             # 반납에 해당하는 컬러 값"d9d9d9"
             rentalSheet.cell(row=Floc, column=x).fill = PatternFill(start_color="d9d9d9", end_color="d9d9d9", fill_type="solid")
+        rentalSheet.cell(row=Floc, column=12, value="반납")
+        rentalSheet.cell(row=Floc, column=13, value="")
+        
+        rental.save("정합성 단말 대여 리스트_"+ str(today).replace("-","")[2:8] +".xlsx") # IMEI 추가 후 저장
+    elif int(imei) in Rimeis : # IMEI 값이 RIMEIS에 들어있는지 체크
+       Floc = (Rimeis.index(int(imei)))+1
+       for x in range(1, rentalSheet.max_column+1):
+        # 반납에 해당하는 컬러 값"d9d9d9"
+        rentalSheet.cell(row=Floc, column=x).fill = PatternFill(start_color="d9d9d9", end_color="d9d9d9", fill_type="solid")
         rentalSheet.cell(row=Floc, column=12, value="반납")
         rentalSheet.cell(row=Floc, column=13, value="")
         
