@@ -5,8 +5,8 @@ from tkinter import *
 import tkinter.ttk as ttk
 from openpyxl import load_workbook
 from openpyxl.styles import PatternFill, Font, Border, Side, Alignment
-from datetime import datetime
-
+from datetime import datetime, timedelta
+import os
 
 ########################################################################################
 
@@ -19,12 +19,28 @@ root.resizable(False, False) # 창 크기 변경 가능 여부 설정
 
 # 엑셀 파일 불러오기
 today = datetime.today()
-db = load_workbook("list.xlsx")
-rental = load_workbook("정합성 단말 대여 리스트_"+ str(today).replace("-","")[2:8] +".xlsx") # 엑셀 리스트 목록 실시간 체크를 위해 버튼 액션에서 로딩
-rentalSheet = rental.active # Sheet 활성화
 
+# 정합성 대여 단말 리스트 엑셀 불러오기
+
+directory = "D:\Python" # 파일이 존재하는 위치 변수
+for filename in os.listdir(directory):
+        f = os.path.join(directory, filename) # 파일 리스트 생성
+if "정합성 단말 대여 리스트_"+ str(today).replace("-","")[2:8] +".xlsx" in f:
+    rental = load_workbook("정합성 단말 대여 리스트_"+ str(today).replace("-","")[2:8] +".xlsx") # today 날짜의 파일이 있으면 파일 불러오기
+    print(str(today)[2:10] + " 파일 오픈")
+else:
+    for n in range(1, 14):
+        if "정합성 단말 대여 리스트_"+ str(today-timedelta(days=n)).replace("-","")[2:8] +".xlsx" in f: # today 날짜의 파일이 없는 경우 하루씩 돌아가며 체크
+            rental = load_workbook("정합성 단말 대여 리스트_"+ str(today-timedelta(days=n)).replace("-","")[2:8] +".xlsx") # 해당 날짜의 파일 불러오기
+            rentalSheet = rental.active # 엑셀 시트 활성화
+            print(str(today-timedelta(days=n))[2:10] + " 파일 오픈") # 오픈한 파일의 날짜를 출력.
+            break
+        else:
+            print(str(today-timedelta(days=n))[2:10] + " 파일 없음")
+
+# T4팀 보유 단말 리스트 엑셀 불러오기
+db = load_workbook("list.xlsx") 
 dbSheet = db.active 
-
 
 ########################################################################################
 
@@ -37,9 +53,9 @@ num = Entry(frame1, width=30) # 텍스트 필드 생성 후 num 에 저장
 num.pack() # num pack
 
 # 대여자
-lender = ttk.Combobox(frame1, values=["배진우", "오정민", "송희성"], width=8)
-lender.current(2)
-lender.pack(pady=(10, 0))
+lender = ttk.Combobox(frame1, state="readonly", values=["배진우", "오정민", "송희성"], width=8) # readonly = 입력 불가 / disable = 비활성화
+lender.current(2) # 초기 표시 데이터 값 지정
+lender.pack(pady=(10, 0)) # 
 
 ########################################################################################
 
