@@ -147,12 +147,13 @@ def back():
             # 반납에 해당하는 컬러 값"d9d9d9"
             rentalSheet.cell(row=Floc, column=x).fill = PatternFill(start_color="d9d9d9", end_color="d9d9d9", fill_type="solid")
         rentalSheet.cell(row=Floc, column=12, value="반납")
-        rentalSheet.cell(row=Floc, column=13, value="delete").font = Font(name="맑은 고딕", size=10, color="d9d9d9")
+        rentalSheet.cell(row=Floc, column=13, value=" ")
         
         rental.save("정합성 단말 대여 리스트_"+ str(today).replace("-","")[2:8] +".xlsx") # IMEI 추가 후 저장
     else:
         print("없는데 뭘 찾는 거야")
 ########################################################################################
+
 
 ########################################################################################
 def delete():
@@ -160,11 +161,11 @@ def delete():
     Rimeis = [] # 대여 리스트 엑셀의 imei를 담을 리스트
     Mloc=[]
     for rx in rentalSheet["M"]:
-        Rimeis.append(rx.value) # 대여 리스트 엑셀에서 F열값 리스트 생성
+        Rimeis.append(rx.value) # 대여 리스트 엑셀에서 M열값 리스트 생성
     
     for x in range(0, len(Rimeis)):
-        if Rimeis[x] == "delete": 
-            Mloc.append(x+1) # 비고 값이 delete인 행의 위치를 저장
+        if Rimeis[x] == " ": 
+            Mloc.append(x+1) # 비고 값이 ' '인 행의 위치를 저장
 
     Mloc.reverse() # 순서대로 삭제할 경우 의도대로 삭제되지 않아 삭제할 순서 뒤집기
 
