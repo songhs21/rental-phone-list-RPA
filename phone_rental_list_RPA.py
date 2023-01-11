@@ -10,14 +10,25 @@ import os
 import shutil
 
 ########################################################################################
-
 #Tkinter 생성
 root = Tk() # Tkinter 생성
 root.title("IMEI 추가 귀찮은ww") # 타이틀 설정
 root.geometry("400x100") # 창 크기 설정
 root.resizable(False, False) # 창 크기 변경 가능 여부 설정
 
+frame1 = Frame(root) # 프레임 생성
+frame1.pack(side="left", fill="both", pady=(18,0), expand=True) # 프레임 표시
 
+# IMEI
+Label(frame1, text="IMEI").pack() # "이름" 라벨 생성 후 pack
+num = Entry(frame1, width=30) # 텍스트 필드 생성 후 num 에 저장
+num.pack() # num pack
+
+# 대여자
+lender = ttk.Combobox(frame1, state="readonly", values=["배진우", "오정민", "송희성"], width=8) # readonly = 입력 불가 / disable = 비활성화
+lender.current(2) # 초기 표시 데이터 값 지정
+lender.pack(pady=(10, 0)) # 
+########################################################################################
 # 엑셀 파일 불러오기
 today = datetime.today()
 
@@ -32,11 +43,9 @@ if "정합성 단말 대여 리스트_"+ str(today).replace("-","")[2:8] +".xlsx
 else:
     for n in range(1, 15): # 2주 전까지 하루씩 탐색
         if "정합성 단말 대여 리스트_"+ str(today-timedelta(days=n)).replace("-","")[2:8] +".xlsx" in f: # today 날짜의 파일이 없는 경우 하루씩 돌아가며 체크
-            # rental = load_workbook("정합성 단말 대여 리스트_"+ str(today-timedelta(days=n)).replace("-","")[2:8] +".xlsx") # 해당 날짜의 파일 불러오기
-            # rentalSheet = rental.active # 엑셀 시트 활성화
             shutil.copy("정합성 단말 대여 리스트_"+ str(today-timedelta(days=n)).replace("-","")[2:8] +".xlsx",\
-                "정합성 단말 대여 리스트_"+ str(today).replace("-","")[2:8] +".xlsx")
-            print(str(today-timedelta(days=n))[2:10] + ">" + str(today)[2:10]+" copy & change date") # 전 파일 복사 후 당일 날짜로 교체
+                "정합성 단말 대여 리스트_"+ str(today).replace("-","")[2:8] +".xlsx") # 오늘 날짜가 아닐 경우에 복사 후 오늘 날짜로 변경
+            print(str(today-timedelta(days=n))[2:10] + ">" + str(today)[2:10]+" copy & date change")
             break
 
 rental = load_workbook("정합성 단말 대여 리스트_"+ str(today).replace("-","")[2:8] +".xlsx")
@@ -45,31 +54,16 @@ rentalSheet = rental.active
 # T4팀 보유 단말 리스트 엑셀 불러오기
 db = load_workbook("list.xlsx") 
 dbSheet = db.active 
-
 ########################################################################################
-
-frame1 = Frame(root) # 프레임 생성
-frame1.pack(side="left", fill="both", pady=(18,0), expand=True) # 프레임 표시
-
-# IMEI
-Label(frame1, text="IMEI").pack() # "이름" 라벨 생성 후 pack
-num = Entry(frame1, width=30) # 텍스트 필드 생성 후 num 에 저장
-num.pack() # num pack
-
-# 대여자
-lender = ttk.Combobox(frame1, state="readonly", values=["배진우", "오정민", "송희성"], width=8) # readonly = 입력 불가 / disable = 비활성화
-lender.current(2) # 초기 표시 데이터 값 지정
-lender.pack(pady=(10, 0)) # 
 
 
 
 ########################################################################################
-
 def Add():
     # K2 날짜 확인
     days = rentalSheet.cell(row=2, column=12).value # K2의 날짜를 체크할 변수
     if days[0:11] not in str(today): # today의 날짜 값과 days의 날짜 값이 다른지 체크
-        rentalSheet.cell(row=2, column=12, value=str(today)[0:11]+" 확인") # 다르면 K2에 추가하는 날의 날짜로 변경
+        rentalSheet.cell(row=2, column=12, value=str(today)[0:11]+"확인") # 다르면 K2에 추가하는 날의 날짜로 변경
     
     # 단말 대여 처리
     imei = str(num.get()) # 입력 받은 imei를 저장할 변수
@@ -80,7 +74,7 @@ def Add():
     if len(imei) == 15:
 
         for dx in dbSheet["E"]:
-            DBimeis.append(str(dx.value)) # list 엑셀에서 E열값을 받아와 imei 리스트 생성
+            DBimeis.append(str(dx.value)) # 보유 단말 리스트 엑셀에서 E열값을 받아와 imei 리스트 생성
 
         for rx in rentalSheet["F"]:
             Rimeis.append(str(rx.value)) # 대여 리스트 엑셀에서 F열값을 받아와 imei 리스트 생성
@@ -158,6 +152,8 @@ def back():
 
 ########################################################################################
 def delete():
+    # K2 날짜 미리 변경
+    rentalSheet.cell(row=2, column=12, value=str(today+timedelta(days=1))[0:11]+"확인") # 다르면 K2에 추가하는 날의 날짜로 변경
 
     Rimeis = [] # 대여 리스트 엑셀의 imei를 담을 리스트
     Mloc=[]
@@ -181,7 +177,7 @@ def delete():
         if n > rentalSheet.max_row:
             break # n 값이 마지막 행을 넘어갈 경우 반복문 종료
     
-    rental.save("정합성 단말 대여 리스트_"+ str(today).replace("-","")[2:8] +".xlsx") # IMEI 삭제 후 저장
+    rental.save("정합성 단말 대여 리스트_"+ str(today+timedelta(days=1)).replace("-","")[2:8] +".xlsx") # IMEI 삭제 후 다음 날짜로 저장
 ########################################################################################
 
 frame2 = Frame(root)
