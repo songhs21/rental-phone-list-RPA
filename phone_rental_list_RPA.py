@@ -12,7 +12,7 @@ import shutil
 ########################################################################################
 #Tkinter 생성
 root = Tk() # Tkinter 생성
-root.title("IMEI 추가 귀찮은ww") # 타이틀 설정
+root.title("단말 대여 자동화 툴") # 타이틀 설정
 root.geometry("400x100") # 창 크기 설정
 root.resizable(False, False) # 창 크기 변경 가능 여부 설정
 
