@@ -25,7 +25,7 @@ num = Entry(frame1, width=30) # 텍스트 필드 생성 후 num 에 저장
 num.pack() # num pack
 
 # 대여자
-lender = ttk.Combobox(frame1, state="readonly", values=["배진우", "오정민", "송희성"], width=8) # readonly = 입력 불가 / disable = 비활성화
+lender = ttk.Combobox(frame1, state="readonly", values=["사원1", "사원2", "송희성"], width=8) # readonly = 입력 불가 / disable = 비활성화
 lender.current(2) # 초기 표시 데이터 값 지정
 lender.pack(pady=(10, 0)) # 
 ########################################################################################
@@ -110,9 +110,9 @@ def Add():
             rentalSheet.cell(row=rentalSheet.max_row, column=10, value=str(today)[0:10])
             rentalSheet.cell(row=rentalSheet.max_row, column=11, value="O")
             rentalSheet.cell(row=rentalSheet.max_row, column=12, value="미반납")
-            if name == "오정민" or name == "송희성":
+            if name == "사원2" or name == "송희성":
                 rentalSheet.cell(row=rentalSheet.max_row, column=13, value="MR 검증중")
-            elif name == "배진우":
+            elif name == "사원1":
                 rentalSheet.cell(row=rentalSheet.max_row, column=13, value="PCT 장비 사용중")
             
             rental.save("정합성 단말 대여 리스트_"+ str(today).replace("-","")[2:8] +".xlsx") # IMEI 추가 후 저장
